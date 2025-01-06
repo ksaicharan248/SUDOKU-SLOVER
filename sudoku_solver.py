@@ -2,7 +2,7 @@ import pygame
 import time
 import random
 from copy import deepcopy
-from sudokutools import is_valid_placement as check_valid_move, solve_puzzle as solve_board, locate_empty_cell as find_empty_cell, create_puzzle as generate_sudoku_board
+from sudokuraw import is_valid_placement as check_valid_move, solve_puzzle as solve_board, locate_empty_cell as find_empty_cell, create_puzzle as generate_sudoku_board
 
 pygame.init()
 
