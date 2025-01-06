@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Solver</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Link to the separate JavaScript file -->
+    <script>
+        function checkSolution() {
+            const inputs = document.querySelectorAll('.sudoku-cell input');
+            const solution = {{ solved_puzzle | tojson }};
+            let correct = true;
+
+            // Reset previous errors
+            inputs.forEach(input => {
+                input.style.backgroundColor = '';  // Clear previous red highlights
+                input.disabled = false;  // Enable inputs for re-checking
+            });
+
+            // Check if user input matches solution
+            inputs.forEach((input, index) => {
+                const row = Math.floor(index / 9);
+                const col = index % 9;
+                const correctValue = solution[row][col];
+
+                if (input.value && parseInt(input.value) !== correctValue) {
+                    input.style.backgroundColor = 'red';  // Highlight incorrect cells
+                    correct = false;
+                    input.disabled = true;  // Disable input if it is wrong
+                }
+            });
+
+            // Show message if the solution is correct or not
+            if (correct) {
+                alert("Congratulations! All values are correct.");
+            } else {
+                alert("There are some incorrect values!");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Sudoku Solver</h1>
+        <form action="{{ url_for('solve') }}" method="POST">
+            <div class="sudoku-grid">
+                {% for row in puzzle %}
+                    {% for cell in row %}
+                        <div class="sudoku-cell">
+                            {% if cell == 0 %}
+                                <input type="text" name="cell" maxlength="1" class="empty-cell">
+                            {% else %}
+                                <input type="text" name="cell" value="{{ cell }}" readonly class="filled-cell">
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            <div class="buttons">
+                <button type="button" onclick="checkSolution()">Check</button>
+                <a href="{{ url_for('index') }}" class="button">Generate New Puzzle</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
