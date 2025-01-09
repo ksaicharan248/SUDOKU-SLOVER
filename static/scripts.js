@@ -1,6 +1,6 @@
 function checkSolution() {
     const inputs = document.querySelectorAll('.sudoku-cell input');
-    const solution = {{ solved_puzzle | tojson }};
+    const solvedPuzzle = JSON.parse(document.getElementById('solvedPuzzle').textContent);
     let correct = true;
 
     // Reset previous errors
@@ -13,12 +13,11 @@ function checkSolution() {
     inputs.forEach((input, index) => {
         const row = Math.floor(index / 9);
         const col = index % 9;
-        const correctValue = solution[row][col];
+        const correctValue = solvedPuzzle[row][col];
 
         if (input.value && parseInt(input.value) !== correctValue) {
             input.style.backgroundColor = 'red';  // Highlight incorrect cells
-            correct = false;
-            input.disabled = true;  // Disable input if it is wrong
+            correct = false; // Disable input if it is wrong
         }
     });
 

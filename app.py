@@ -1,10 +1,26 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import random
+import copy
 app = Flask(__name__)
+app.secret_key = 'sai'
+
+def display_puzzle(grid):
+        puzzle_string = ""
+        for row in range(9):
+            for col in range(9):
+                puzzle_string += str(grid[row][col]) + " "
+                if (col + 1) % 3 == 0 and col != 0 and col + 1 != 9:
+                    puzzle_string += "| "
+
+                if col == 8:
+                    puzzle_string += "\n"
+
+                if col == 8 and (row + 1) % 3 == 0 and row + 1 != 9:
+                    puzzle_string += "- - - - - - - - - - - \n"
+        print(puzzle_string)
 
 
-
-def solve_puzzle(puzzle):
+def solve_puzzle(puzzle: list):
     """Solves the Sudoku puzzle using backtracking."""
     def is_valid(num, row, col):
         for i in range(9):
@@ -29,10 +45,11 @@ def solve_puzzle(puzzle):
                             puzzle[i][j] = 0
                     return False
         return True
-
+    
     backtrack()
-
     return puzzle
+
+
 # Generate a random Sudoku puzzle (placeholder for simplicity)
 def generate_puzzle():
     """Generates a random valid Sudoku puzzle."""
@@ -55,8 +72,9 @@ def generate_puzzle():
     empties = random.randint(40, 50)  # Number of cells to empty
     for p in random.sample(range(squares), empties):
         board[p // side][p % side] = 0
-    #sloved_board = solve_puzzle(board)
-    return board
+    puzzle = copy.deepcopy(board)
+    fianl_puzzle = solve_puzzle(board)
+    return puzzle, fianl_puzzle
 
 
 # Solve the puzzle using backtracking
@@ -65,11 +83,15 @@ def generate_puzzle():
 
 @app.route("/")
 def index():
-    puzzle = generate_puzzle()
-    return render_template("index.html", puzzle=puzzle)
+    puzzle,solved_puzzle = generate_puzzle()
+    session['puzzle'] = puzzle
+    session['solved_puzzle'] = solved_puzzle
+    session['referrer'] = request.referrer
+    return render_template("index.html", puzzle=puzzle , solved_puzzle= solved_puzzle)
 
 @app.route("/solve", methods=["POST"])
 def solve():
+    print("i am here ")
     puzzle_data = request.form.getlist("cell")
     if len(puzzle_data) != 81:
         return "Error: Puzzle data must contain exactly 81 values."
@@ -85,5 +107,12 @@ def solve():
     solved_puzzle = solve_puzzle(puzzle)
     return render_template("solved.html", solved_puzzle=solved_puzzle)
 
+
+@app.route("/show_solution")
+def show_solution():
+    solved_puzzle = session.get('solved_puzzle')
+    return render_template("solved.html", solved_puzzle=solved_puzzle)
+
 if __name__ == "__main__":
     app.run(debug=True)
+    

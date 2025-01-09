@@ -19,7 +19,7 @@
             {% endfor %}
         </div>
         <div class="buttons">
-            <a href="{{ url_for('index') }}" class="button">Back to Puzzle</a>
+            <a href="{{ session.get('referrer', url_for('index')) }}" class="button">Back to Puzzle</a>
         </div>
     </div>
 </body>
